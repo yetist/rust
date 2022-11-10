@@ -421,6 +421,10 @@ extern "C" LLVMTargetMachineRef LLVMRustCreateTargetMachine(
   }
   Options.RelaxELFRelocations = RelaxELFRelocations;
   Options.UseInitArray = UseInitArray;
+  if (ForceEmulatedTls) {
+    Options.ExplicitEmulatedTLS = true;
+    Options.EmulatedTLS = true;
+  }
 
 #if LLVM_VERSION_LT(17, 0)
   if (ForceEmulatedTls) {
