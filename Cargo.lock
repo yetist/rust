@@ -875,9 +875,9 @@ dependencies = [
 
 [[package]]
 name = "compiler_builtins"
-version = "0.1.85"
+version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13e81c6cd7ab79f51a0c927d22858d61ad12bd0b3865f0b13ece02a4486aeabb"
+checksum = "9fc9c2080d347a2c316518840ac9194644a9993dfa1e9778ef38979a339f5d8b"
 dependencies = [
  "cc",
  "rustc-std-workspace-core",
@@ -2343,9 +2343,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.138"
+version = "0.2.140"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db6d7e329c562c5dfab7a46a2afabc8b987ab9a4834c9d1ca04dc54c1546cef8"
+checksum = "99227334921fae1a979cf0bfdfcc6b3e5ce376ef57e16fb6fb3ea2ed6095f80c"
 dependencies = [
  "rustc-std-workspace-core",
 ]

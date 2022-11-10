@@ -1261,6 +1261,9 @@ supported_targets! {
 
     ("aarch64-unknown-nto-qnx710", aarch64_unknown_nto_qnx_710),
     ("x86_64-pc-nto-qnx710", x86_64_pc_nto_qnx710),
+
+    ("aarch64-unknown-linux-ohos", aarch64_unknown_linux_ohos),
+    ("armv7-unknown-linux-ohos", armv7_unknown_linux_ohos),
 }
 
 /// Cow-Vec-Str: Cow<'static, [Cow<'static, str>]>
@@ -1723,6 +1726,9 @@ pub struct TargetOptions {
     /// The ABI of entry function.
     /// Default value is `Conv::C`, i.e. C call convention
     pub entry_abi: Conv,
+
+    /// Forces the use of emulated TLS (__emutls_get_address)
+    pub force_emulated_tls: bool,
 }
 
 /// Add arguments for the given flavor and also for its "twin" flavors
@@ -1942,6 +1948,7 @@ impl Default for TargetOptions {
             supports_stack_protector: true,
             entry_name: "main".into(),
             entry_abi: Conv::C,
+            force_emulated_tls: false,
         }
     }
 }
@@ -2597,6 +2604,7 @@ impl Target {
         key!(supports_stack_protector, bool);
         key!(entry_name);
         key!(entry_abi, Conv)?;
+        key!(force_emulated_tls, bool);
 
         if base.is_builtin {
             // This can cause unfortunate ICEs later down the line.
@@ -2850,6 +2858,7 @@ impl ToJson for Target {
         target_option_val!(supports_stack_protector);
         target_option_val!(entry_name);
         target_option_val!(entry_abi);
+        target_option_val!(force_emulated_tls);
 
         if let Some(abi) = self.default_adjusted_cabi {
             d.insert("default-adjusted-cabi".into(), Abi::name(abi).to_json());

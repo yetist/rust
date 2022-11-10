@@ -237,6 +237,8 @@ const EXTRA_CHECK_CFGS: &[(Option<Mode>, &'static str, Option<&[&'static str]>)]
     (Some(Mode::ToolRustc), "span_locations", None),
     // Can be passed in RUSTFLAGS to prevent direct syscalls in rustix.
     (None, "rustix_use_libc", None),
+    // #[cfg(bootstrap)] ohos
+    (Some(Mode::Std), "target_env", Some(&["ohos"])),
 ];
 
 /// A structure representing a Rust compiler.
