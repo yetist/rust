@@ -857,8 +857,8 @@ impl InlineAsmClobberAbi {
                 _ => Err(&["C", "system", "efiapi"]),
             },
             InlineAsmArch::LoongArch64 => match name {
-                "C" | "system" | "efiapi" => Ok(InlineAsmClobberAbi::LoongArch),
-                _ => Err(&["C", "system", "efiapi"]),
+                "C" | "system" => Ok(InlineAsmClobberAbi::LoongArch),
+                _ => Err(&["C", "system"]),
             },
             _ => Err(&[]),
         }
