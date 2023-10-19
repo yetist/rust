@@ -255,6 +255,7 @@ declare_features! (
     (active, cmpxchg16b_target_feature, "1.32.0", Some(44839), None),
     (active, ermsb_target_feature, "1.49.0", Some(44839), None),
     (active, hexagon_target_feature, "1.27.0", Some(44839), None),
+    (active, loongarch_target_feature, "1.73.0", Some(44839), None),
     (active, mips_target_feature, "1.27.0", Some(44839), None),
     (active, movbe_target_feature, "1.34.0", Some(44839), None),
     (active, powerpc_target_feature, "1.27.0", Some(44839), None),
