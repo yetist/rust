@@ -369,6 +369,9 @@ jobs:
           - name: dist-mipsel-linux
             <<: *job-linux-xl
 
+          - name: dist-ohos
+            <<: *job-linux-8c
+
           - name: dist-powerpc-linux
             <<: *job-linux-xl
 
