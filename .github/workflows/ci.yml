@@ -212,6 +212,21 @@ jobs:
           - name: dist-loongarch64-linux
             os: ubuntu-20.04-8core-32gb
             env: {}
+          - name: dist-mips-linux
+            os: ubuntu-20.04-xl
+            env: {}
+          - name: dist-mips64-linux
+            os: ubuntu-20.04-xl
+            env: {}
+          - name: dist-mips64el-linux
+            os: ubuntu-20.04-xl
+            env: {}
+          - name: dist-mipsel-linux
+            os: ubuntu-20.04-xl
+            env: {}
+          - name: dist-ohos
+            os: ubuntu-20.04-8core-32gb
+            env: {}
           - name: dist-powerpc-linux
             os: ubuntu-20.04-8core-32gb
             env: {}

@@ -130,6 +130,7 @@ target | std | notes
 `aarch64-fuchsia` | ✓ | Alias for `aarch64-unknown-fuchsia`
 `aarch64-unknown-fuchsia` | ✓ | ARM64 Fuchsia
 [`aarch64-linux-android`](platform-support/android.md) | ✓ | ARM64 Android
+[`aarch64-unknown-linux-ohos`](platform-support/openharmony.md) | ✓ | ARM64 OpenHarmony
 `aarch64-unknown-none-softfloat` | * | Bare ARM64, softfloat
 `aarch64-unknown-none` | * | Bare ARM64, hardfloat
 [`aarch64-unknown-uefi`](platform-support/unknown-uefi.md) | * | ARM64 UEFI
@@ -144,6 +145,7 @@ target | std | notes
 `armv7-unknown-linux-gnueabi` | ✓ | ARMv7-A Linux (kernel 4.15, glibc 2.27)
 `armv7-unknown-linux-musleabi` | ✓ | ARMv7-A Linux with MUSL
 `armv7-unknown-linux-musleabihf` | ✓ | ARMv7-A Linux with MUSL, hardfloat
+[`armv7-unknown-linux-ohos`](platform-support/openharmony.md) | ✓ | ARMv7-A OpenHarmony
 `armv7a-none-eabi` | * | Bare ARMv7-A
 `armv7r-none-eabi` | * | Bare ARMv7-R
 `armv7r-none-eabihf` | * | Bare ARMv7-R, hardfloat
@@ -189,6 +191,7 @@ target | std | notes
 [`x86_64-linux-android`](platform-support/android.md) | ✓ | 64-bit x86 Android
 `x86_64-pc-solaris` | ✓ | 64-bit Solaris 10/11, illumos
 `x86_64-unknown-linux-gnux32` | ✓ | 64-bit Linux (x32 ABI) (kernel 4.15, glibc 2.27)
+[`x86_64-unknown-linux-ohos`](platform-support/openharmony.md) | ✓ | x86_64 OpenHarmony
 [`x86_64-unknown-none`](platform-support/x86_64-unknown-none.md) | * | Freestanding/bare-metal x86_64, softfloat
 `x86_64-unknown-redox` | ✓ | Redox OS
 [`x86_64-unknown-uefi`](platform-support/unknown-uefi.md) | * | 64-bit UEFI
