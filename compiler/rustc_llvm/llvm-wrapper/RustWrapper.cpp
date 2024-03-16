@@ -1995,3 +1995,39 @@ extern "C" int32_t LLVMRustGetElementTypeArgIndex(LLVMValueRef CallSite) {
 extern "C" bool LLVMRustIsBitcode(char *ptr, size_t len) {
   return identify_magic(StringRef(ptr, len)) == file_magic::bitcode;
 }
+
+extern "C" bool LLVMRustIsNonGVFunctionPointerTy(LLVMValueRef V) {
+  if (unwrap<Value>(V)->getType()->isPointerTy()) {
+    if (auto *GV = dyn_cast<GlobalValue>(unwrap<Value>(V))) {
+      if (GV->getValueType()->isFunctionTy())
+        return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+extern "C" bool LLVMRustLLVMHasZlibCompressionForDebugSymbols() {
+  return llvm::compression::zlib::isAvailable();
+}
+
+extern "C" bool LLVMRustLLVMHasZstdCompressionForDebugSymbols() {
+  return llvm::compression::zstd::isAvailable();
+}
+
+// Operations on composite constants.
+// These are clones of LLVM api functions that will become available in future releases.
+// They can be removed once Rust's minimum supported LLVM version supports them.
+// See https://github.com/rust-lang/rust/issues/121868
+// See https://llvm.org/doxygen/group__LLVMCCoreValueConstantComposite.html
+
+// FIXME: Remove when Rust's minimum supported LLVM version reaches 19.
+// https://github.com/llvm/llvm-project/commit/e1405e4f71c899420ebf8262d5e9745598419df8
+#if LLVM_VERSION_LT(19, 0)
+extern "C" LLVMValueRef LLVMConstStringInContext2(LLVMContextRef C,
+                                                  const char *Str,
+                                                  size_t Length,
+                                                  bool DontNullTerminate) {
+  return wrap(ConstantDataArray::getString(*unwrap(C), StringRef(Str, Length), !DontNullTerminate));
+}
+#endif

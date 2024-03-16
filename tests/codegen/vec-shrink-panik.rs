@@ -1,5 +1,8 @@
-// compile-flags: -O
-// ignore-debug: the debug assertions get in the way
+// LLVM 17 realizes double panic is not possible and doesn't generate calls
+// to panic_cannot_unwind.
+//@ compile-flags: -O
+//@ ignore-debug: plain old debug assertions
+//@ needs-unwind
 #![crate_type = "lib"]
 #![feature(shrink_to)]
 
@@ -16,14 +19,6 @@ pub fn shrink_to_fit(vec: &mut Vec<u32>) {
 // CHECK-LABEL: @issue71861
 #[no_mangle]
 pub fn issue71861(vec: Vec<u32>) -> Box<[u32]> {
-    // CHECK-NOT: panic
-
-    // Call to panic_cannot_unwind in case of double-panic is expected,
-    // but other panics are not.
-    // CHECK: cleanup
-    // CHECK-NEXT: ; call core::panicking::panic_cannot_unwind
-    // CHECK-NEXT: panic_cannot_unwind
-
     // CHECK-NOT: panic
     vec.into_boxed_slice()
 }
@@ -42,6 +37,3 @@ pub fn issue75636<'a>(iter: &[&'a str]) -> Box<[&'a str]> {
     // CHECK-NOT: panic
     iter.iter().copied().collect()
 }
-
-// CHECK: ; core::panicking::panic_cannot_unwind
-// CHECK: declare void @{{.*}}panic_cannot_unwind
