@@ -656,17 +656,18 @@ impl Build {
         }
 
         println!("Updating submodule {}", relative_path.display());
-        self.run(
-            Command::new("git")
-                .args(&["submodule", "-q", "sync"])
-                .arg(relative_path)
-                .current_dir(&self.config.src),
-        );
+//        self.run(
+//            Command::new("git")
+//                .args(&["submodule", "-q", "sync"])
+//                .arg(relative_path)
+//                .current_dir(&self.config.src),
+//        );
 
         // Try passing `--progress` to start, then run git again without if that fails.
         let update = |progress: bool| {
             let mut git = Command::new("git");
-            git.args(&["submodule", "update", "--init", "--recursive", "--depth=1"]);
+//            git.args(&["submodule", "update", "--init", "--recursive", "--depth=1"]);
+            git.args(&["--version"]);
             if progress {
                 git.arg("--progress");
             }
