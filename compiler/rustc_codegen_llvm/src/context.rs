@@ -143,12 +143,25 @@ pub unsafe fn create_module<'ll>(
 
     let mut target_data_layout = sess.target.data_layout.to_string();
     let llvm_version = llvm_util::get_version();
-    if llvm_version < (18, 0, 0) {
-        if sess.target.arch == "x86" || sess.target.arch == "x86_64" {
-            // LLVM 18 adjusts i128 to be 128-bit aligned on x86 variants.
-            // Earlier LLVMs leave this as default alignment, so remove it.
-            // See https://reviews.llvm.org/D86310
-            target_data_layout = target_data_layout.replace("-i128:128", "");
+    if llvm_version < (14, 0, 0) {
+        if sess.target.llvm_target == "i686-pc-windows-msvc"
+            || sess.target.llvm_target == "i586-pc-windows-msvc"
+        {
+            target_data_layout =
+                "e-m:x-p:32:32-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:32-n8:16:32-a:0:32-S32"
+                    .to_string();
+        }
+        if sess.target.arch == "wasm32" {
+            target_data_layout = target_data_layout.replace("-p10:8:8-p20:8:8", "");
+        }
+    }
+    if llvm_version < (16, 0, 0) {
+        if sess.target.arch == "s390x" {
+            target_data_layout = target_data_layout.replace("-v128:64", "");
+        }
+
+        if sess.target.arch == "riscv64" {
+            target_data_layout = target_data_layout.replace("-n32:64-", "-n64-");
         }
     }
 

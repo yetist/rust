@@ -57,10 +57,6 @@ jobs:
             tidy: false
             os: ubuntu-20.04-xl
             env: {}
-          - name: x86_64-gnu-llvm-17
-            env:
-              ENABLE_GCC_CODEGEN: "1"
-            os: ubuntu-20.04-16core-64gb
           - name: x86_64-gnu-tools
             tidy: false
             env:
@@ -308,7 +304,7 @@ jobs:
           - name: x86_64-gnu-llvm-13-stage1
             env:
               RUST_BACKTRACE: 1
-            os: ubuntu-20.04-8core-32gb
+            os: ubuntu-20.04-xl
           - name: x86_64-gnu-nopt
             os: ubuntu-20.04-xl
             env: {}

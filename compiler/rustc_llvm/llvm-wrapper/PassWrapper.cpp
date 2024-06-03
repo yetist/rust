@@ -21,7 +21,12 @@
 #include "llvm/Passes/StandardInstrumentations.h"
 #include "llvm/Support/CBindingWrapping.h"
 #include "llvm/Support/FileSystem.h"
-#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/Host.h"
+#if LLVM_VERSION_LT(14, 0)
+#include "llvm/Support/TargetRegistry.h"
+#else
+#include "llvm/MC/TargetRegistry.h"
+#endif
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/IPO/AlwaysInliner.h"
@@ -334,8 +339,13 @@ extern "C" void LLVMRustPrintTargetCPUs(LLVMTargetMachineRef TM) {
 
   std::ostringstream Buf;
 
-  const MCSubtargetInfo *MCInfo = Target->getMCSubtargetInfo();
+#if LLVM_VERSION_GE(17, 0)
   const ArrayRef<SubtargetSubTypeKV> CPUTable = MCInfo->getAllProcessorDescriptions();
+#else
+  Buf << "Full target CPU help is not supported by this LLVM version.\n\n";
+  SubtargetSubTypeKV TargetCPUKV = { TargetCPU, {{}}, {{}} };
+  const ArrayRef<SubtargetSubTypeKV> CPUTable = TargetCPUKV;
+#endif
   unsigned MaxCPULen = getLongestEntryLength(CPUTable);
 
   printf("Available CPUs for this target:\n");
@@ -433,7 +443,10 @@ extern "C" LLVMTargetMachineRef LLVMRustCreateTargetMachine(
   }
   Options.RelaxELFRelocations = RelaxELFRelocations;
   Options.UseInitArray = UseInitArray;
-  Options.EmulatedTLS = UseEmulatedTls;
+  if (ForceEmulatedTls) {
+    Options.ExplicitEmulatedTLS = true;
+    Options.EmulatedTLS = true;
+  }
 
   if (TrapUnreachable) {
     // Tell LLVM to codegen `unreachable` into an explicit trap instruction.
@@ -657,38 +670,25 @@ LLVMRustOptimize(
     LLVMSelfProfileInitializeCallbacks(PIC,LlvmSelfProfiler,BeforePassCallback,AfterPassCallback);
   }
 
+#if LLVM_VERSION_LT(16, 0)
+  Optional<PGOOptions> PGOOpt;
+#else
   std::optional<PGOOptions> PGOOpt;
-  auto FS = vfs::getRealFileSystem();
+#endif
   if (PGOGenPath) {
     assert(!PGOUsePath && !PGOSampleUsePath);
-    PGOOpt = PGOOptions(PGOGenPath, "", "", "", FS,
-                        PGOOptions::IRInstr, PGOOptions::NoCSAction,
-#if LLVM_VERSION_GE(19, 0)
-                        PGOOptions::ColdFuncOpt::Default,
-#endif
-                        DebugInfoForProfiling);
+    PGOOpt = PGOOptions(PGOGenPath, "", "", PGOOptions::IRInstr,
+                        PGOOptions::NoCSAction, DebugInfoForProfiling);
   } else if (PGOUsePath) {
     assert(!PGOSampleUsePath);
-    PGOOpt = PGOOptions(PGOUsePath, "", "", "", FS,
-                        PGOOptions::IRUse, PGOOptions::NoCSAction,
-#if LLVM_VERSION_GE(19, 0)
-                        PGOOptions::ColdFuncOpt::Default,
-#endif
-                        DebugInfoForProfiling);
+    PGOOpt = PGOOptions(PGOUsePath, "", "", PGOOptions::IRUse,
+                        PGOOptions::NoCSAction, DebugInfoForProfiling);
   } else if (PGOSampleUsePath) {
-    PGOOpt = PGOOptions(PGOSampleUsePath, "", "", "", FS,
-                        PGOOptions::SampleUse, PGOOptions::NoCSAction,
-#if LLVM_VERSION_GE(19, 0)
-                        PGOOptions::ColdFuncOpt::Default,
-#endif
-                        DebugInfoForProfiling);
+    PGOOpt = PGOOptions(PGOSampleUsePath, "", "", PGOOptions::SampleUse,
+                        PGOOptions::NoCSAction, DebugInfoForProfiling);
   } else if (DebugInfoForProfiling) {
-    PGOOpt = PGOOptions("", "", "", "", FS,
-                        PGOOptions::NoAction, PGOOptions::NoCSAction,
-#if LLVM_VERSION_GE(19, 0)
-                        PGOOptions::ColdFuncOpt::Default,
-#endif
-                        DebugInfoForProfiling);
+    PGOOpt = PGOOptions("", "", "", PGOOptions::NoAction,
+                        PGOOptions::NoCSAction, DebugInfoForProfiling);
   }
 
   PassBuilder PB(TM, PTO, PGOOpt, &PIC);
@@ -1246,14 +1246,6 @@ LLVMRustCreateThinLTOData(LLVMRustThinLTOModule *modules,
       return true;
     return Prevailing->second == S;
   };
-  ComputeCrossModuleImport(
-    Ret->Index,
-    Ret->ModuleToDefinedGVSummaries,
-    isPrevailing,
-    Ret->ImportLists,
-    Ret->ExportLists
-  );
-
   auto recordNewLinkage = [&](StringRef ModuleIdentifier,
                               GlobalValue::GUID GUID,
                               GlobalValue::LinkageTypes NewLinkage) {
