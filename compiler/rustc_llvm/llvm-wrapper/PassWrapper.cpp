@@ -421,7 +421,10 @@ extern "C" LLVMTargetMachineRef LLVMRustCreateTargetMachine(
   }
   Options.RelaxELFRelocations = RelaxELFRelocations;
   Options.UseInitArray = UseInitArray;
-  Options.EmulatedTLS = UseEmulatedTls;
+  if (ForceEmulatedTls) {
+    Options.ExplicitEmulatedTLS = true;
+    Options.EmulatedTLS = true;
+  }
 
 #if LLVM_VERSION_LT(17, 0)
   if (ForceEmulatedTls) {
@@ -656,6 +659,9 @@ LLVMRustOptimize(
     LLVMSelfProfileInitializeCallbacks(PIC,LlvmSelfProfiler,BeforePassCallback,AfterPassCallback);
   }
 
+#if LLVM_VERSION_LT(16, 0)
+  Optional<PGOOptions> PGOOpt;
+#else
   std::optional<PGOOptions> PGOOpt;
 #endif
 #if LLVM_VERSION_GE(17, 0)
