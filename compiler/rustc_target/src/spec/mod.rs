@@ -1437,7 +1437,6 @@ supported_targets! {
 
     ("loongarch64-unknown-none", loongarch64_unknown_none),
     ("loongarch64-unknown-none-softfloat", loongarch64_unknown_none_softfloat),
-    ("loongarch64-linux-ohos", loongarch64_linux_ohos),
     ("loongarch64-unknown-linux-ohos", loongarch64_unknown_linux_ohos),
 
     ("aarch64-unknown-none", aarch64_unknown_none),
@@ -1495,9 +1494,7 @@ supported_targets! {
     ("x86_64-pc-nto-qnx710", x86_64_pc_nto_qnx710),
     ("i586-pc-nto-qnx700", i586_pc_nto_qnx700),
 
-    ("aarch64-linux-ohos", aarch64_linux_ohos),
     ("aarch64-unknown-linux-ohos", aarch64_unknown_linux_ohos),
-    ("armv7-linux-ohos", armv7_linux_ohos),
     ("armv7-unknown-linux-ohos", armv7_unknown_linux_ohos),
 }
 
