@@ -298,6 +298,7 @@ static Reloc::Model fromRust(LLVMRustRelocModel RustReloc) {
   report_fatal_error("Bad RelocModel.");
 }
 
+#ifdef LLVM_RUSTLLVM
 /// getLongestEntryLength - Return the length of the longest entry in the table.
 template<typename KV>
 static size_t getLongestEntryLength(ArrayRef<KV> Table) {
@@ -315,25 +316,24 @@ extern "C" void LLVMRustPrintTargetCPUs(LLVMTargetMachineRef TM,
                                         void* Out) {
   const TargetMachine *Target = unwrap(TM);
   const MCSubtargetInfo *MCInfo = Target->getMCSubtargetInfo();
-  const Triple::ArchType HostArch = Triple(sys::getDefaultTargetTriple()).getArch();
+  const Triple::ArchType HostArch = Triple(sys::getProcessTriple()).getArch();
   const Triple::ArchType TargetArch = Target->getTargetTriple().getArch();
+
+  std::ostringstream Buf;
 
 #if LLVM_VERSION_GE(17, 0)
   const ArrayRef<SubtargetSubTypeKV> CPUTable = MCInfo->getAllProcessorDescriptions();
-#elif defined(LLVM_RUSTLLVM)
-  const ArrayRef<SubtargetSubTypeKV> CPUTable = MCInfo->getCPUTable();
 #else
-  printf("Full target CPU help is not supported by this LLVM version.\n\n");
+  Buf << "Full target CPU help is not supported by this LLVM version.\n\n";
   SubtargetSubTypeKV TargetCPUKV = { TargetCPU, {{}}, {{}} };
   const ArrayRef<SubtargetSubTypeKV> CPUTable = TargetCPUKV;
 #endif
   unsigned MaxCPULen = getLongestEntryLength(CPUTable);
 
-  printf("Available CPUs for this target:\n");
+  Buf << "Available CPUs for this target:\n";
   // Don't print the "native" entry when the user specifies --target with a
   // different arch since that could be wrong or misleading.
   if (HostArch == TargetArch) {
-    MaxCPULen = std::max(MaxCPULen, (unsigned) std::strlen("native"));
     const StringRef HostCPU = sys::getHostCPUName();
     Buf << "    " << std::left << std::setw(MaxCPULen) << "native"
         << " - Select the CPU of the current host "
@@ -342,31 +342,33 @@ extern "C" void LLVMRustPrintTargetCPUs(LLVMTargetMachineRef TM,
   for (auto &CPU : CPUTable) {
     // Compare cpu against current target to label the default
     if (strcmp(CPU.Key, TargetCPU) == 0) {
-      printf("    %-*s - This is the default target CPU"
-      " for the current build target (currently %s).",
-        MaxCPULen, CPU.Key, Target->getTargetTriple().str().c_str());
+      Buf << "    " << std::left << std::setw(MaxCPULen) << CPU.Key
+          << " - This is the default target CPU for the current build target "
+             "(currently " << Target->getTargetTriple().str() << ").";
     }
     else {
-      printf("    %-*s", MaxCPULen, CPU.Key);
+      Buf << "    " << CPU.Key;
     }
-    printf("\n");
+    Buf << "\n";
   }
+
+  const auto &BufString = Buf.str();
+  Print(Out, BufString.data(), BufString.size());
 }
 
 extern "C" size_t LLVMRustGetTargetFeaturesCount(LLVMTargetMachineRef TM) {
-#ifdef LLVM_RUSTLLVM
+  return 0;
+#if 0
   const TargetMachine *Target = unwrap(TM);
   const MCSubtargetInfo *MCInfo = Target->getMCSubtargetInfo();
   const ArrayRef<SubtargetFeatureKV> FeatTable = MCInfo->getFeatureTable();
   return FeatTable.size();
-#else
-  return 0;
 #endif
 }
 
 extern "C" void LLVMRustGetTargetFeature(LLVMTargetMachineRef TM, size_t Index,
                                          const char** Feature, const char** Desc) {
-#ifdef LLVM_RUSTLLVM
+#if 0
   const TargetMachine *Target = unwrap(TM);
   const MCSubtargetInfo *MCInfo = Target->getMCSubtargetInfo();
   const ArrayRef<SubtargetFeatureKV> FeatTable = MCInfo->getFeatureTable();
@@ -375,6 +377,19 @@ extern "C" void LLVMRustGetTargetFeature(LLVMTargetMachineRef TM, size_t Index,
   *Desc = Feat.Desc;
 #endif
 }
+
+#else
+
+extern "C" void LLVMRustPrintTargetCPUs(LLVMTargetMachineRef) {
+  printf("Target CPU help is not supported by this LLVM version.\n\n");
+}
+
+extern "C" size_t LLVMRustGetTargetFeaturesCount(LLVMTargetMachineRef) {
+  return 0;
+}
+
+extern "C" void LLVMRustGetTargetFeature(LLVMTargetMachineRef, const char**, const char**) {}
+#endif
 
 extern "C" const char* LLVMRustGetHostCPUName(size_t *len) {
   StringRef Name = sys::getHostCPUName();
