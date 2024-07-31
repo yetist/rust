@@ -497,12 +497,12 @@ impl Build {
 
             // Make sure we update these before gathering metadata so we don't get an error about missing
             // Cargo.toml files.
-            let rust_submodules = ["src/tools/cargo", "library/backtrace", "library/stdarch"];
-            for s in rust_submodules {
-                build.update_submodule(Path::new(s));
-            }
-            // Now, update all existing submodules.
-            build.update_existing_submodules();
+//            let rust_submodules = ["src/tools/cargo", "library/backtrace", "library/stdarch"];
+//            for s in rust_submodules {
+//                build.update_submodule(Path::new(s));
+//            }
+//            // Now, update all existing submodules.
+//            build.update_existing_submodules();
 
             build.verbose("learning about cargo");
             metadata::build(&mut build);
