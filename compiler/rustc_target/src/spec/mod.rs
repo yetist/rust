@@ -1434,6 +1434,8 @@ supported_targets! {
     ("riscv64gc-unknown-none-elf", riscv64gc_unknown_none_elf),
     ("riscv64gc-unknown-linux-gnu", riscv64gc_unknown_linux_gnu),
     ("riscv64gc-unknown-linux-musl", riscv64gc_unknown_linux_musl),
+    ("riscv64-unknown-linux-musl", riscv64_unknown_linux_musl),
+    ("riscv64-unknown-linux-ohos", riscv64_unknown_linux_ohos),
 
     ("loongarch64-unknown-none", loongarch64_unknown_none),
     ("loongarch64-unknown-none-softfloat", loongarch64_unknown_none_softfloat),
